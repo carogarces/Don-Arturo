@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Don Arturo — Registro de Domicilios</title>
+<style>
+:root{--marron:#3D1C00;--naranja:#E8541E;--crema:#FFF8F0;--crema-dk:#F5E6D3;--verde:#2D8B4E;--verde-lt:#E8F5E9;--gris:#666;--morado:#7B1FA2;--morado-lt:#F3E5F5}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--crema);color:var(--marron)}
+.header{background:var(--marron);color:var(--crema);padding:16px;text-align:center;position:sticky;top:0;z-index:100}
+.header h1{font-size:18px;font-weight:700}
+.header-sub{font-size:12px;opacity:.7;margin-top:2px}
+.tabs{display:flex;background:var(--marron);padding:0 16px 12px;gap:8px;position:sticky;top:56px;z-index:99}
+.tab{flex:1;padding:10px;border:none;border-radius:8px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;text-align:center}
+.tab.on{background:var(--naranja);color:#fff}
+.tab:not(.on){background:rgba(255,255,255,.1);color:rgba(255,255,255,.6)}
+.content{padding:16px;max-width:500px;margin:0 auto}
+.section{display:none}.section.on{display:block}
+
+/* Form */
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:11px;font-weight:600;color:var(--gris);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.fi,.ft{width:100%;padding:12px;border:2px solid var(--crema-dk);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--marron);outline:none}
+.fi:focus,.ft:focus{border-color:var(--naranja)}
+.ft{resize:none;height:70px}
+.pb{display:flex;gap:8px}
+.pbtn{flex:1;padding:12px;border:2px solid var(--crema-dk);border-radius:10px;background:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;text-align:center}
+.pbtn.sel{border-color:var(--naranja);background:#FFF0E8;color:var(--naranja)}
+.sub{width:100%;padding:16px;background:var(--verde);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:8px}
+.sub:active{transform:scale(.98);opacity:.9}
+.suc{background:var(--verde-lt);border:1px solid var(--verde);border-radius:10px;padding:14px;text-align:center;margin-bottom:16px;display:none;font-size:14px;color:var(--verde);font-weight:600;animation:fi .3s}
+@keyframes fi{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+
+/* Day view */
+.dn{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.dn button{background:#fff;border:2px solid var(--crema-dk);border-radius:8px;padding:8px 14px;font-size:16px;cursor:pointer;color:var(--marron)}
+.dn button:active{background:var(--crema-dk)}
+.dl{font-size:15px;font-weight:700}
+.sr{display:flex;gap:8px;margin-bottom:14px}
+.sc{flex:1;background:#fff;border-radius:10px;padding:10px;text-align:center;box-shadow:0 1px 3px rgba(61,28,0,.08)}
+.sn{font-size:20px;font-weight:800;color:var(--naranja)}
+.sl{font-size:10px;color:var(--gris);margin-top:2px;text-transform:uppercase}
+
+.oc{background:#fff;border-radius:10px;padding:12px;margin-bottom:8px;box-shadow:0 1px 3px rgba(61,28,0,.08);position:relative;border-left:4px solid var(--morado)}
+.oc .ot{font-size:12px;color:var(--gris);font-weight:600}
+.oc .on2{font-size:14px;font-weight:700;color:var(--marron);margin:4px 0 2px}
+.oc .oi{font-size:12px;color:var(--gris);line-height:1.4}
+.oc .oa{font-size:12px;color:var(--morado);margin-top:3px}
+.oc .otel{font-size:12px;color:var(--gris);margin-top:2px}
+.oc .op{font-size:11px;margin-top:3px;display:inline-block;padding:2px 8px;border-radius:4px}
+.op.efectivo{background:#E8F5E9;color:var(--verde)}
+.op.transferencia{background:#E3F2FD;color:#1565C0}
+.oc .ov{font-size:16px;font-weight:800;color:var(--verde);margin-top:6px}
+.oc .od{position:absolute;top:10px;right:10px;background:none;border:none;font-size:16px;cursor:pointer;opacity:.3}
+.emp{text-align:center;padding:40px 20px;color:var(--gris)}
+.emp .em{font-size:40px;margin-bottom:10px}
+
+/* Month table */
+.mtb{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(61,28,0,.08);margin-bottom:14px}
+.mtb th{background:var(--marron);color:var(--crema);font-size:11px;padding:8px 6px;text-align:left}
+.mtb td{padding:8px 6px;font-size:12px;border-bottom:1px solid var(--crema-dk);color:var(--marron)}
+.mtb tr:last-child td{border-bottom:none}
+.mtb .tr{background:var(--verde-lt);font-weight:700}
+.mtb .tr td{color:var(--verde)}
+
+/* Export */
+.exp{width:100%;padding:12px;background:var(--marron);color:var(--crema);border:none;border-radius:10px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;margin-top:12px}
+.exp:active{opacity:.8}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🐷 Don Arturo — Domicilios</h1>
+  <div class="header-sub">Registro de pedidos a domicilio</div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="sTab('nuevo',this)">+ Nuevo</button>
+  <button class="tab" onclick="sTab('hoy',this)">📋 Hoy</button>
+  <button class="tab" onclick="sTab('mes',this)">📊 Mes</button>
+</div>
+
+<div class="content">
+
+  <!-- NUEVO PEDIDO -->
+  <div class="section on" id="s-nuevo">
+    <div class="suc" id="sucMsg">✅ ¡Domicilio registrado!</div>
+
+    <div class="fg">
+      <label class="fl">Nombre del cliente</label>
+      <input type="text" class="fi" id="fNom" placeholder="Ej: María López">
+    </div>
+
+    <div class="fg">
+      <label class="fl">Celular</label>
+      <input type="tel" class="fi" id="fTel" placeholder="Ej: 301 234 5678">
+    </div>
+
+    <div class="fg">
+      <label class="fl">Dirección de entrega</label>
+      <input type="text" class="fi" id="fDir" placeholder="Ej: Cra 52 #78-30, Santa María">
+    </div>
+
+    <div class="fg">
+      <label class="fl">Apartamento / Torre (si aplica)</label>
+      <input type="text" class="fi" id="fApto" placeholder="Ej: Torre 3, Apto 402">
+    </div>
+
+    <div class="fg">
+      <label class="fl">Pedido</label>
+      <textarea class="ft" id="fPed" placeholder="Ej: 1 Almuerzo Tierra y Mar, 2 Coca-Cola"></textarea>
+    </div>
+
+    <div class="fg">
+      <label class="fl">Total ($)</label>
+      <input type="number" class="fi" id="fTot" placeholder="Ej: 31000" inputmode="numeric">
+    </div>
+
+    <div class="fg">
+      <label class="fl">Forma de pago</label>
+      <div class="pb">
+        <button class="pbtn sel" onclick="sPago(this,'efectivo')">💵 Efectivo</button>
+        <button class="pbtn" onclick="sPago(this,'transferencia')">💳 Transferencia</button>
+      </div>
+    </div>
+
+    <button class="sub" onclick="guardar()">✅ Registrar Domicilio</button>
+  </div>
+
+  <!-- HOY -->
+  <div class="section" id="s-hoy">
+    <div id="diaView"></div>
+  </div>
+
+  <!-- MES -->
+  <div class="section" id="s-mes">
+    <div id="mesView"></div>
+  </div>
+
+</div>
+
+<script>
+let pago='efectivo';
+let vD=new Date(),vM=new Date();
+const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const dias=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+
+function gO(){try{return JSON.parse(localStorage.getItem('da_dom')||'[]')}catch{return[]}}
+function sO(o){localStorage.setItem('da_dom',JSON.stringify(o))}
+
+function sPago(btn,tipo){
+  pago=tipo;
+  document.querySelectorAll('.pbtn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+function guardar(){
+  const nom=document.getElementById('fNom').value.trim();
+  const tel=document.getElementById('fTel').value.trim();
+  const dir=document.getElementById('fDir').value.trim();
+  const apto=document.getElementById('fApto').value.trim();
+  const ped=document.getElementById('fPed').value.trim();
+  const tot=parseInt(document.getElementById('fTot').value)||0;
+
+  if(!nom||!ped||!tot||!dir){alert('Completa nombre, dirección, pedido y total.');return}
+
+  const dirCompleta=apto?dir+' — '+apto:dir;
+
+  const order={
+    id:Date.now(),
+    fecha:new Date().toISOString(),
+    nombre:nom,
+    telefono:tel,
+    direccion:dirCompleta,
+    pedido:ped,
+    total:tot,
+    pago:pago
+  };
+
+  const orders=gO();orders.push(order);sO(orders);
+
+  document.getElementById('fNom').value='';
+  document.getElementById('fTel').value='';
+  document.getElementById('fDir').value='';
+  document.getElementById('fApto').value='';
+  document.getElementById('fPed').value='';
+  document.getElementById('fTot').value='';
+
+  const msg=document.getElementById('sucMsg');
+  msg.style.display='block';
+  setTimeout(()=>msg.style.display='none',3000);
+}
+
+function sTab(tab,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('s-'+tab).classList.add('on');
+  if(tab==='hoy')rDia();
+  if(tab==='mes')rMes();
+}
+
+function fFecha(d){
+  return dias[d.getDay()]+' '+d.getDate()+' de '+meses[d.getMonth()]+' '+d.getFullYear();
+}
+
+function fFechaCorta(d){
+  return d.getDate()+'/'+meses[d.getMonth()].substring(0,3)+'/'+d.getFullYear();
+}
+
+// DIA
+function rDia(){
+  const ds=vD.toISOString().split('T')[0];
+  const os=gO().filter(o=>o.fecha.startsWith(ds)).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
+  const tot=os.reduce((s,o)=>s+o.total,0);
+  const efec=os.filter(o=>o.pago==='efectivo').reduce((s,o)=>s+o.total,0);
+  const trans=os.filter(o=>o.pago==='transferencia').reduce((s,o)=>s+o.total,0);
+
+  let h=`<div class="dn">
+    <button onclick="vD.setDate(vD.getDate()-1);rDia()">◀</button>
+    <span class="dl">${fFecha(vD)}</span>
+    <button onclick="vD.setDate(vD.getDate()+1);rDia()">▶</button>
+  </div>
+  <div class="sr">
+    <div class="sc"><div class="sn">${os.length}</div><div class="sl">Domicilios</div></div>
+    <div class="sc"><div class="sn">$${tot.toLocaleString('es-CO')}</div><div class="sl">Total</div></div>
+  </div>
+  <div class="sr">
+    <div class="sc"><div class="sn">$${efec.toLocaleString('es-CO')}</div><div class="sl">💵 Efectivo</div></div>
+    <div class="sc"><div class="sn">$${trans.toLocaleString('es-CO')}</div><div class="sl">💳 Transferencia</div></div>
+  </div>`;
+
+  if(!os.length){h+=`<div class="emp"><div class="em">🚚</div><p>No hay domicilios este día</p></div>`;document.getElementById('diaView').innerHTML=h;return}
+
+  os.forEach(o=>{
+    const d=new Date(o.fecha);
+    const hr=d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
+    h+=`<div class="oc">
+      <button class="od" onclick="borrar(${o.id})">✕</button>
+      <span class="ot">🕐 ${hr}</span>
+      <div class="on2">${o.nombre}</div>
+      <div class="oi">${o.pedido}</div>
+      <div class="oa">📍 ${o.direccion}</div>
+      <div class="otel">📱 ${o.telefono}</div>
+      <span class="op ${o.pago}">${o.pago==='efectivo'?'💵 Efectivo':'💳 Transferencia'}</span>
+      <div class="ov">$${o.total.toLocaleString('es-CO')}</div>
+    </div>`;
+  });
+
+  document.getElementById('diaView').innerHTML=h;
+}
+
+function borrar(id){
+  if(!confirm('¿Eliminar este domicilio?'))return;
+  sO(gO().filter(o=>o.id!==id));
+  rDia();
+}
+
+// MES
+function rMes(){
+  const y=vM.getFullYear(),m=vM.getMonth();
+  const pf=`${y}-${(m+1).toString().padStart(2,'0')}`;
+  const os=gO().filter(o=>o.fecha.startsWith(pf));
+  const tot=os.reduce((s,o)=>s+o.total,0);
+  const efec=os.filter(o=>o.pago==='efectivo').reduce((s,o)=>s+o.total,0);
+  const trans=os.filter(o=>o.pago==='transferencia').reduce((s,o)=>s+o.total,0);
+
+  let h=`<div class="dn">
+    <button onclick="vM.setMonth(vM.getMonth()-1);rMes()">◀</button>
+    <span class="dl">${meses[m]} ${y}</span>
+    <button onclick="vM.setMonth(vM.getMonth()+1);rMes()">▶</button>
+  </div>
+  <div class="sr">
+    <div class="sc"><div class="sn">${os.length}</div><div class="sl">Domicilios</div></div>
+    <div class="sc"><div class="sn">$${tot.toLocaleString('es-CO')}</div><div class="sl">Total</div></div>
+  </div>
+  <div class="sr">
+    <div class="sc"><div class="sn">$${efec.toLocaleString('es-CO')}</div><div class="sl">💵 Efectivo</div></div>
+    <div class="sc"><div class="sn">$${trans.toLocaleString('es-CO')}</div><div class="sl">💳 Transferencia</div></div>
+  </div>`;
+
+  const bD={};
+  os.forEach(o=>{
+    const d=o.fecha.split('T')[0];
+    if(!bD[d])bD[d]={c:0,t:0,e:0,tr:0};
+    bD[d].c++;bD[d].t+=o.total;
+    if(o.pago==='efectivo')bD[d].e+=o.total;
+    else bD[d].tr+=o.total;
+  });
+  const days=Object.keys(bD).sort();
+
+  if(!days.length){h+=`<div class="emp"><div class="em">📊</div><p>No hay domicilios este mes</p></div>`;document.getElementById('mesView').innerHTML=h;return}
+
+  h+=`<table class="mtb"><thead><tr><th>Día</th><th>Pedidos</th><th>💵</th><th>💳</th><th>Total</th></tr></thead><tbody>`;
+  days.forEach(day=>{
+    const d=new Date(day+'T12:00:00');
+    const r=bD[day];
+    h+=`<tr>
+      <td>${d.getDate()}/${meses[d.getMonth()].substring(0,3)}/${d.getFullYear()}</td>
+      <td>${r.c}</td>
+      <td>$${r.e.toLocaleString('es-CO')}</td>
+      <td>$${r.tr.toLocaleString('es-CO')}</td>
+      <td>$${r.t.toLocaleString('es-CO')}</td>
+    </tr>`;
+  });
+
+  h+=`<tr class="tr">
+    <td><b>Total</b></td>
+    <td><b>${os.length}</b></td>
+    <td><b>$${efec.toLocaleString('es-CO')}</b></td>
+    <td><b>$${trans.toLocaleString('es-CO')}</b></td>
+    <td><b>$${tot.toLocaleString('es-CO')}</b></td>
+  </tr></tbody></table>`;
+
+  h+=`<button class="exp" onclick="exportar()">📥 Exportar datos del mes</button>`;
+
+  document.getElementById('mesView').innerHTML=h;
+}
+
+function exportar(){
+  const y=vM.getFullYear(),m=vM.getMonth();
+  const pf=`${y}-${(m+1).toString().padStart(2,'0')}`;
+  const os=gO().filter(o=>o.fecha.startsWith(pf)).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
+
+  if(!os.length){alert('No hay datos para exportar');return}
+
+  let csv='Fecha,Hora,Nombre,Celular,Dirección,Pedido,Pago,Total\n';
+  os.forEach(o=>{
+    const d=new Date(o.fecha);
+    const fecha=d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear();
+    const hora=d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
+    csv+=`"${fecha}","${hora}","${o.nombre}","${o.telefono}","${o.direccion}","${o.pedido}","${o.pago}","${o.total}"\n`;
+  });
+
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`domicilios-don-arturo-${meses[m]}-${y}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>
